@@ -1,5 +1,6 @@
 package com.webintegral.controller;
 
+import com.webintegral.dto.StudentDto;
 import com.webintegral.model.Student;
 import com.webintegral.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,34 +26,42 @@ public class StudentController {
     private final StudentRepository studentRepository;
 
     @GetMapping
-    public List<Student> findAll() {
-        return studentRepository.findAll();
+    public List<StudentDto> findAll() {
+        return studentRepository.findAll().stream()
+                .map(Student::toDto)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public Student findById(@PathVariable Integer id) {
+    public StudentDto findById(@PathVariable Integer id) {
         return studentRepository.findById(id)
+                .map(Student::toDto)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Student create(@RequestBody Student student) {
-        student.setId(null);
-        return studentRepository.save(student);
+    public StudentDto create(@RequestBody StudentDto studentDto) {
+        Student student = Student.builder()
+                .name(studentDto.getName())
+                .lastName(studentDto.getLastName())
+                .phone(studentDto.getPhone())
+                .email(studentDto.getEmail())
+                .build();
+        return studentRepository.save(student).toDto();
     }
 
     @PutMapping("/{id}")
-    public Student update(@PathVariable Integer id, @RequestBody Student student) {
+    public StudentDto update(@PathVariable Integer id, @RequestBody StudentDto studentDto) {
         Student existing = studentRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
 
-        existing.setName(student.getName());
-        existing.setLastName(student.getLastName());
-        existing.setPhone(student.getPhone());
-        existing.setEmail(student.getEmail());
+        existing.setName(studentDto.getName());
+        existing.setLastName(studentDto.getLastName());
+        existing.setPhone(studentDto.getPhone());
+        existing.setEmail(studentDto.getEmail());
 
-        return studentRepository.save(existing);
+        return studentRepository.save(existing).toDto();
     }
 
     @DeleteMapping("/{id}")
