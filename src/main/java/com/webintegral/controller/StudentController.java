@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+// Controlador REST para la gestión de estudiantes
 @RestController
 @RequestMapping(value = "/student")
 public class StudentController {
@@ -20,6 +21,7 @@ public class StudentController {
         this.studentService = studentService;
     }
 
+    // Obtiene la lista de todos los estudiantes
     @GetMapping
     public ResponseEntity<List<StudentDto>> findAll() {
         List<StudentDto> students = studentService.findAll();
